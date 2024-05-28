@@ -16,6 +16,7 @@ import React, { useEffect, useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useLocation, useNavigate } from "react-router-dom";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { createUser, signIn } from "../dbManager/dbManager";
 
 const AuthView = () => {
   const location = useLocation();
@@ -166,7 +167,7 @@ const AuthView = () => {
 
               <Button
                 variant="contained"
-                onClick={() => {
+                onClick={async () => {
                   console.log("UserName", username);
                   console.log("Password", password);
                   localStorage.setItem(
@@ -176,12 +177,13 @@ const AuthView = () => {
                       password: password,
                     })
                   );
+                  await createUser(username, password);
                 }}
               >
                 Sign Up
               </Button>
               <Button
-                onClick={() => {
+                onClick={async () => {
                   clearTextFields();
                   setSignUp(false);
                 }}
@@ -240,7 +242,7 @@ const AuthView = () => {
               />
               <Button
                 variant="contained"
-                onClick={() => {
+                onClick={async () => {
                   console.log("UserName", username);
                   console.log("Password", password);
                   console.log("Confirmed password", confirmPassword);
@@ -252,6 +254,7 @@ const AuthView = () => {
                       password: password,
                     })
                   );
+                  await signIn(username, password);
                 }}
               >
                 Sign In
