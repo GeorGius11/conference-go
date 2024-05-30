@@ -11,6 +11,7 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import ConferenceList from "./ConferenceList";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -26,11 +27,13 @@ function TabPanel(props: TabPanelProps) {
       role="tabpanel"
       hidden={value !== index}
       id={`vertical-tabpanel-${index}`}
-      aria-labelledby={`vertical-tab-${index}`}
       {...other}
+      style={{
+        width: "100%",
+      }}
     >
       {value === index && (
-        <Box sx={{ p: 3 }}>
+        <Box sx={{ p: 1 }}>
           <Typography>{children}</Typography>
         </Box>
       )}
@@ -76,47 +79,45 @@ const MainView = () => {
         flexDirection: "column",
       }}
     >
-      <div>
-        <AppBar>
-          <Toolbar>
-            <IconButton
-              size="large"
-              edge="start"
-              color="inherit"
-              aria-label="menu"
-              sx={{ mr: 2 }}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-              Conference-GO
-            </Typography>
-            <Button
-              color="inherit"
-              onClick={() => {
-                navigate("/authorization", {
-                  state: { from: "home", signUp: false },
-                });
-              }}
-            >
-              Login
-            </Button>
-            <Button
-              color="inherit"
-              onClick={() => {
-                navigate("/authorization", {
-                  state: { from: "home", signUp: true },
-                });
-              }}
-            >
-              SIGNUP
-            </Button>
-          </Toolbar>
-        </AppBar>
-      </div>
+      <AppBar>
+        <Toolbar>
+          <IconButton
+            size="large"
+            edge="start"
+            color="inherit"
+            aria-label="menu"
+            sx={{ mr: 2 }}
+          >
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+            Conference-GO
+          </Typography>
+          <Button
+            color="inherit"
+            onClick={() => {
+              navigate("/authorization", {
+                state: { from: "home", signUp: false },
+              });
+            }}
+          >
+            Login
+          </Button>
+          <Button
+            color="inherit"
+            onClick={() => {
+              navigate("/authorization", {
+                state: { from: "home", signUp: true },
+              });
+            }}
+          >
+            SIGNUP
+          </Button>
+        </Toolbar>
+      </AppBar>
       <Box
         sx={{
-          bgcolor: "background.paper",
+          bgcolor: "lightgray",
           display: "flex",
           width: "100%",
           height: "calc(100% - 64px)",
@@ -129,7 +130,7 @@ const MainView = () => {
           value={value}
           onChange={handleChange}
           aria-label="Vertical tabs example"
-          sx={{ borderRight: 1, borderColor: "divider" }}
+          sx={{ borderRight: 1, borderColor: "divider", bgcolor: "#FFF" }}
         >
           <Tab label="Conferences" {...a11yProps(0)} />
           <Tab label="Item Two" {...a11yProps(1)} />
@@ -140,7 +141,17 @@ const MainView = () => {
           <Tab label="Item Seven" {...a11yProps(6)} />
         </Tabs>
         <TabPanel value={value} index={0}>
-          Conferences
+          <div
+            style={{
+              width: "100%",
+              height: "100%",
+              justifyContent: "center",
+              alignItems: "center",
+              display: "flex",
+            }}
+          >
+            <ConferenceList />
+          </div>
         </TabPanel>
         <TabPanel value={value} index={1}>
           Item Two

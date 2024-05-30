@@ -25,3 +25,15 @@ export const createUser = async (username, password) => {
   //   if (success) console.log("SUCCESS");
   //   else console.log("FUCK");
 };
+
+export const getConferences = async (username, password) => {
+  const response = await fetch("http://localhost:4200/getConferences", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ username: username, password: password }),
+  });
+
+  return response.json();
+};
