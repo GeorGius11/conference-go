@@ -32,8 +32,28 @@ export const getConferences = async (username, password) => {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ username: username, password: password }),
+    body: JSON.stringify({ username, password }),
   });
 
-  return response.json();
+  if (!response.ok) {
+    throw new Error("Failed to fetch conferences");
+  }
+
+  return await response.json();
+};
+
+export const deleteConference = async (username, password, conferenceId) => {
+  const response = await fetch("http://localhost:4200/deleteConference", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ username, password, conferenceId }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to delete conference");
+  }
+
+  return await response.json();
 };

@@ -1,18 +1,21 @@
+import React, { useState, useEffect } from "react";
 import List from "@mui/material/List";
-import { getConferences } from "../dbManager/dbManager";
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import { useEffect, useState } from "react";
 import { styled } from "@mui/material/styles";
 import MuiAccordion, { AccordionProps } from "@mui/material/Accordion";
 import MuiAccordionSummary, {
   AccordionSummaryProps,
 } from "@mui/material/AccordionSummary";
 import MuiAccordionDetails from "@mui/material/AccordionDetails";
-import ArrowForwardIosSharpIcon from "@mui/icons-material/ArrowForwardIosSharp";
 import { Box, Typography } from "@mui/material";
+import { deleteConference, getConferences } from "../dbManager/dbManager";
 import { formatDate } from "../helpers/helper";
+import UpdateIcon from "@mui/icons-material/Update";
 
 interface Conference {
+  ID: string;
   Name: string;
   Description: string;
   Price: number;
@@ -35,7 +38,7 @@ const Accordion = styled((props: AccordionProps) => (
 
 const AccordionSummary = styled((props: AccordionSummaryProps) => (
   <MuiAccordionSummary
-    expandIcon={<ArrowForwardIosSharpIcon sx={{ fontSize: "0.9rem" }} />}
+    expandIcon={<ExpandMoreIcon sx={{ fontSize: "0.9rem" }} />}
     {...props}
   />
 ))(({ theme }) => ({
@@ -57,7 +60,7 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
   borderTop: "1px solid rgba(0, 0, 0, .125)",
 }));
 
-export default function ConferenceList() {
+const ConferenceList: React.FC = () => {
   const [conferences, setConferences] = useState<Conference[]>([]);
   const [expanded, setExpanded] = useState<string | false>("");
 
@@ -68,28 +71,59 @@ export default function ConferenceList() {
 
   useEffect(() => {
     const asyncWrapper = async () => {
-      const user = JSON.parse(localStorage.getItem("user") ?? "");
-
-      console.log(user);
-
-      const conferencesFromDb = await getConferences(
-        user.username,
-        user.password
-      );
-      setConferences(conferencesFromDb.rows);
-
-      console.log(conferencesFromDb.rows);
+      await updateConferences();
     };
 
     asyncWrapper();
   }, []);
 
+  const updateConferences = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user") ?? "");
+      console.log("Updating conferences for user:", user);
+
+      const response = await getConferences(user.username, user.password);
+      if (response.success) {
+        setConferences(response.rows);
+        console.log("Conferences fetched:", response.rows);
+      } else {
+        console.error("Error fetching conferences:", response.message);
+      }
+    } catch (error) {
+      console.error("Error fetching conferences:", error);
+    }
+  };
+
+  const handleDelete = async (conferenceId: string) => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user") ?? "");
+      console.log("Deleting conference with ID:", conferenceId);
+
+      const response = await deleteConference(
+        user.username,
+        user.password,
+        conferenceId
+      );
+      if (response.success) {
+        console.log("Conference deleted successfully");
+        await updateConferences(); // Update conferences after deletion
+      } else {
+        console.error("Failed to delete conference:", response.message);
+      }
+    } catch (error) {
+      console.error("Error deleting conference:", error);
+    }
+  };
+
   return (
     <List sx={{ width: "100%" }}>
+      <IconButton aria-label="delete" size="large" onClick={updateConferences}>
+        <UpdateIcon />
+      </IconButton>
       {conferences.length > 0 &&
         conferences.map((c) => (
           <div
-            key={c.Name}
+            key={c.ID}
             style={{
               display: "flex",
               borderRadius: "16px",
@@ -100,8 +134,8 @@ export default function ConferenceList() {
             }}
           >
             <Accordion
-              expanded={expanded === c.Name}
-              onChange={handleChange(c.Name)}
+              expanded={expanded === c.ID}
+              onChange={handleChange(c.ID)}
               sx={{
                 width: "100%",
                 borderRadius: "16px",
@@ -124,9 +158,22 @@ export default function ConferenceList() {
                   }}
                 >
                   <Typography>{c.Name}</Typography>
-                  <Typography>
-                    {formatDate(c.Date)} - {formatDate(c.End_date)}
-                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                    }}
+                  >
+                    <IconButton
+                      aria-label="delete"
+                      size="large"
+                      onClick={() => handleDelete(c.ID)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                    <Typography>
+                      {formatDate(c.Date)} - {formatDate(c.End_date)}
+                    </Typography>
+                  </Box>
                 </Box>
               </AccordionSummary>
               <AccordionDetails
@@ -149,4 +196,6 @@ export default function ConferenceList() {
         ))}
     </List>
   );
-}
+};
+
+export default ConferenceList;

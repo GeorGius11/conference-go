@@ -70,27 +70,9 @@ const updateConference = (request, response) => {
   );
 };
 
-const deleteConference = (request, response) => {
-  const id = parseInt(request.params.id);
-
-  pool.query(
-    'DELETE FROM "Conferences" WHERE ID = $1',
-    [id],
-    (error, results) => {
-      if (error) {
-        throw error;
-      }
-      response
-        .status(200)
-        .send(`Conference with ID=${id} deleted successfully`);
-    }
-  );
-};
-
 module.exports = {
   getConferences,
   getConferenceByID,
   createConference,
   updateConference,
-  deleteConference,
 };
