@@ -57,3 +57,19 @@ export const deleteConference = async (username, password, conferenceId) => {
 
   return await response.json();
 };
+
+export const createConference = async (username, password, data) => {
+  const response = await fetch("http://localhost:4200/createConference", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ username, password, data }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to create conference");
+  }
+
+  return await response.json();
+};

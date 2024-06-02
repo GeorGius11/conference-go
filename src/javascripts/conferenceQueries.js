@@ -32,28 +32,6 @@ const getConferenceByID = (request, response) => {
   );
 };
 
-const createConference = (request, response) => {
-  const jsonData = request.body;
-
-  pool.query(
-    'INSERT INTO "Conferences" ("Name", "Description", "Date", "End_date", "Max_number_of_attendees", "Price") VALUES ($1, $2, $3, $4, $5, $6)',
-    [
-      jsonData.title,
-      jsonData.description,
-      jsonData.dateStart,
-      jsonData.dateEnd,
-      jsonData.maxAttendeesNumber,
-      jsonData.price,
-    ],
-    (error, results) => {
-      if (error) {
-        throw error;
-      }
-      response.status(200).json(results.rows);
-    }
-  );
-};
-
 const updateConference = (request, response) => {
   const id = parseInt(request.params.id);
   const { title, description } = request.body;
@@ -73,6 +51,5 @@ const updateConference = (request, response) => {
 module.exports = {
   getConferences,
   getConferenceByID,
-  createConference,
   updateConference,
 };

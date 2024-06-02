@@ -10,9 +10,15 @@ import MuiAccordionSummary, {
 } from "@mui/material/AccordionSummary";
 import MuiAccordionDetails from "@mui/material/AccordionDetails";
 import { Box, Typography } from "@mui/material";
-import { deleteConference, getConferences } from "../dbManager/dbManager";
+import {
+  createConference,
+  deleteConference,
+  getConferences,
+} from "../dbManager/dbManager";
 import { formatDate } from "../helpers/helper";
 import UpdateIcon from "@mui/icons-material/Update";
+import AddIcon from "@mui/icons-material/Add";
+import CreateConferenceDialog from "./CreateConferenceDialog";
 
 interface Conference {
   ID: string;
@@ -63,6 +69,7 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
 const ConferenceList: React.FC = () => {
   const [conferences, setConferences] = useState<Conference[]>([]);
   const [expanded, setExpanded] = useState<string | false>("");
+  const [open, setOpen] = useState<boolean>(false);
 
   const handleChange =
     (panel: string) => (event: React.SyntheticEvent, newExpanded: boolean) => {
@@ -115,8 +122,44 @@ const ConferenceList: React.FC = () => {
     }
   };
 
+  const handleCreateConference = async (data: any) => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user") ?? "");
+
+      console.log(data);
+
+      const response = await createConference(
+        user.username,
+        user.password,
+        data
+      );
+      if (response.success) {
+        console.log("Conference created successfully");
+        await updateConferences();
+      } else {
+        console.error("Failed to create conference:", response.message);
+      }
+    } catch (error) {
+      console.error("Error creating conference:", error);
+    }
+    handleClose();
+  };
+
+  const handleClose = async () => {
+    setOpen(false);
+  };
+
   return (
     <List sx={{ width: "100%" }}>
+      <IconButton
+        aria-label="delete"
+        size="large"
+        onClick={() => {
+          setOpen(true);
+        }}
+      >
+        <AddIcon />
+      </IconButton>
       <IconButton aria-label="delete" size="large" onClick={updateConferences}>
         <UpdateIcon />
       </IconButton>
@@ -194,6 +237,11 @@ const ConferenceList: React.FC = () => {
             </Accordion>
           </div>
         ))}
+      <CreateConferenceDialog
+        open={open}
+        handleCreate={handleCreateConference}
+        handleClose={handleClose}
+      />
     </List>
   );
 };
